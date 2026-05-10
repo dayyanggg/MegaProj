@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CPTR 325 Final Project - Windows Server Lab Network</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* ── Light Theme Overrides ── */
+    body.light-mode {
+      background: radial-gradient(circle at top, #e8f0fe, #f0f4ff);
+      color: #1e293b;
+    }
+    body.light-mode .navbar {
+      background: rgba(255, 255, 255, 0.75);
+      border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+    }
+    body.light-mode .logo { color: #1d4ed8; }
+    body.light-mode .nav-links a { color: #1e293b; }
+    body.light-mode .nav-links a:hover { color: #1d4ed8; }
+    body.light-mode .hero {
+      background: radial-gradient(circle at top, #bfdbfe, #e0eaff 60%);
+    }
+    body.light-mode .hero h1 { color: #0f172a; }
+    body.light-mode .hero p { color: #334155; }
+    body.light-mode .bg-light {
+      background: rgba(59, 130, 246, 0.05);
+      border-top: 1px solid rgba(59, 130, 246, 0.12);
+      border-bottom: 1px solid rgba(59, 130, 246, 0.12);
+    }
+    body.light-mode h2 { color: #0f172a; }
+    body.light-mode h3 { color: #1d4ed8; }
+    body.light-mode p,
+    body.light-mode td,
+    body.light-mode li { color: #334155; }
+    body.light-mode table {
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(59, 130, 246, 0.15);
+    }
+    body.light-mode th { background: #1d4ed8; color: #fff; }
+    body.light-mode td { border-bottom: 1px solid rgba(59, 130, 246, 0.1); }
+    body.light-mode tr:hover { background: rgba(59, 130, 246, 0.06); }
+    
+    /* ── MEMBER PROFILE CARDS ── */
+    body.light-mode .member-card {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(59, 130, 246, 0.15);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    }
+    body.light-mode .member-card:hover {
+      border-color: #3b82f6;
+      box-shadow: 0 20px 40px rgba(59, 130, 246, 0.15);
+      transform: translateY(-8px);
+    }
+    body.light-mode .member-avatar {
+      background: linear-gradient(135deg, #3b82f6, #60a5fa);
+    }
+    body.light-mode .member-name { color: #0f172a; }
+    body.light-mode .member-role { color: #475569; }
+    body.light-mode .member-contrib { color: #64748b; }
+    
+    body.light-mode .card {
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid rgba(59, 130, 246, 0.15);
+    }
+    body.light-mode .card:hover {
+      border-color: #3b82f6;
+      box-shadow: 0 20px 40px rgba(59, 130, 246, 0.15);
+    }
+    body.light-mode .card p { color: #475569; }
+    body.light-mode .references-list a { color: #1d4ed8; }
+    body.light-mode .footer {
+      background: #dbeafe;
+      border-top: 1px solid rgba(59, 130, 246, 0.15);
+      color: #1e293b;
+    }
+    body.light-mode #particles { opacity: 0.6; }
+    body.light-mode::before {
+      background:
+        radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.08), transparent 35%),
+        radial-gradient(circle at 80% 30%, rgba(96, 165, 250, 0.06), transparent 35%),
+        radial-gradient(circle at 50% 80%, rgba(37, 99, 235, 0.05), transparent 40%);
+    }
+
+    /* ── Theme Toggle Button ── */
+    #theme-toggle {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(96, 165, 250, 0.3);
+      color: #e5e7eb;
+      padding: 7px 14px;
+      border-radius: 99px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 500;
+      font-family: "Inter", sans-serif;
+      transition: background 0.25s, border-color 0.25s, color 0.25s, transform 0.2s;
+      white-space: nowrap;
+    }
+    #theme-toggle:hover {
+      background: rgba(96, 165, 250, 0.18);
+      border-color: #60a5fa;
+      transform: translateY(-1px);
+    }
+    body.light-mode #theme-toggle {
+      background: rgba(59, 130, 246, 0.08);
+      border-color: rgba(59, 130, 246, 0.35);
+      color: #1e293b;
+    }
+    body.light-mode #theme-toggle:hover {
+      background: rgba(59, 130, 246, 0.18);
+      border-color: #3b82f6;
+    }
+
+    /* ── Smooth page-wide theme transition ── */
+    body, .navbar, .hero, .card, table, .footer,
+    h2, h3, p, td, li, .member-card {
+      transition:
+        background 0.45s ease,
+        color 0.45s ease,
+        border-color 0.45s ease,
+        box-shadow 0.45s ease;
+    }
+
+    /* ── Scroll Reveal Base ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Stagger children inside a reveal-group */
+    .reveal-group .card,
+    .reveal-group .member-card,
+    .reveal-group tr,
+    .reveal-group li {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .reveal-group.active .card,
+    .reveal-group.active .member-card,
+    .reveal-group.active tr,
+    .reveal-group.active li {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-group.active .card:nth-child(1),
+    .reveal-group.active .member-card:nth-child(1),
+    .reveal-group.active tr:nth-child(1),
+    .reveal-group.active li:nth-child(1)  { transition-delay: 0.05s; }
+    .reveal-group.active .card:nth-child(2),
+    .reveal-group.active .member-card:nth-child(2),
+    .reveal-group.active tr:nth-child(2),
+    .reveal-group.active li:nth-child(2)  { transition-delay: 0.12s; }
+    .reveal-group.active .card:nth-child(3),
+    .reveal-group.active .member-card:nth-child(3),
+    .reveal-group.active tr:nth-child(3),
+    .reveal-group.active li:nth-child(3)  { transition-delay: 0.19s; }
+    .reveal-group.active .card:nth-child(4),
+    .reveal-group.active .member-card:nth-child(4),
+    .reveal-group.active tr:nth-child(4),
+    .reveal-group.active li:nth-child(4)  { transition-delay: 0.26s; }
+
+    /* Slide from left */
+    .reveal-left {
+      opacity: 0;
+      transform: translateX(-40px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal-left.active {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    /* Slide from right */
+    .reveal-right {
+      opacity: 0;
+      transform: translateX(40px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal-right.active {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .reveal, .reveal-left, .reveal-right,
+      .reveal-group .card, .reveal-group .member-card,
+      .reveal-group tr,
+      .reveal-group li {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+      }
+    }
+
+    /* ── MEMBER PROFILE CARDS ── */
+    .members-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      margin-top: 32px;
+    }
+
+    .member-card {
+      background: rgba(15, 23, 42, 0.85);
+      border-radius: 20px;
+      padding: 28px 24px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(96, 165, 250, 0.3);
+      backdrop-filter: blur(12px);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .member-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, #3b82f6, #60a5fa, #3b82f6);
+      transition: left 0.4s ease;
+    }
+
+    .member-card:hover::before {
+      left: 0;
+    }
+
+    .member-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3b82f6, #60a5fa);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 28px;
+      font-weight: 700;
+      color: white;
+      box-shadow: 0 12px 30px rgba(59, 130, 246, 0.4);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
+      z-index: 2;
+      overflow: hidden;
+    }
+
+    .member-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .member-card:hover .member-avatar {
+      transform: scale(1.08) rotate(5deg);
+      box-shadow: 0 20px 40px rgba(59, 130, 246, 0.5);
+    }
+
+    .member-name {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin: 0 0 8px 0;
+      color: #f8fafc;
+      line-height: 1.3;
+    }
+
+    .member-role {
+      display: inline-block;
+      background: linear-gradient(135deg, rgba(96, 165, 250, 0.2), rgba(59, 130, 246, 0.2));
+      color: #60a5fa;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border: 1px solid rgba(96, 165, 250, 0.4);
+      margin-bottom: 16px;
+      backdrop-filter: blur(10px);
+    }
+
+    .member-contrib {
+      color: #cbd5e1;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin: 0;
+      font-weight: 400;
+    }
+
+    /* ── Requirements: First 4 cards always in one horizontal row ── */
+    .cards-first-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      margin-top: 30px;
+    }
+
+    /* ── Extra cards grid (cards 5–16) ── */
+    .cards-extra {
+      display: none;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
+      margin-top: 24px;
+    }
+    .cards-extra.expanded {
+      display: grid;
+    }
+
+    /* ── Show More / Less button ── */
+    .req-toggle-wrap {
+      text-align: center;
+      margin-top: 32px;
+    }
+    #req-toggle-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #3b82f6, #60a5fa);
+      color: #fff;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: "Inter", sans-serif;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    #req-toggle-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 25px rgba(59, 130, 246, 0.4);
+    }
+
+    /* ── ACTIVE NAV HIGHLIGHT ── */
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      position: relative;
+    }
+
+    .nav-link {
+      position: relative;
+      color: #e5e7eb;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.95rem;
+      padding: 12px 0;
+      transition: color 0.3s ease;
+      letter-spacing: 0.5px;
+    }
+
+    .nav-link:hover {
+      color: #60a5fa;
+    }
+
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      width: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #3b82f6, #60a5fa);
+      border-radius: 2px;
+      transform: translateX(-50%);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+    }
+
+    .nav-link.active::after {
+      width: 100%;
+    }
+
+    .nav-link.active {
+      color: #60a5fa;
+      font-weight: 600;
+    }
+
+    /* Light mode nav styles */
+    body.light-mode .nav-link {
+      color: #1e293b;
+    }
+    body.light-mode .nav-link:hover {
+      color: #1d4ed8;
+    }
+    body.light-mode .nav-link.active {
+      color: #1d4ed8;
+    }
+
+    /* Mobile nav adjustments */
+    @media (max-width: 900px) {
+      .cards-first-row {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .members-grid {
+        grid-template-columns: 1fr;
+      }
+      .nav-links {
+        gap: 1.5rem;
+      }
+      .nav-link {
+        font-size: 0.9rem;
+        padding: 10px 0;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .cards-first-row {
+        grid-template-columns: 1fr;
+      }
+      .member-card {
+        padding: 24px 20px;
+      }
+      .member-avatar {
+        width: 70px;
+        height: 70px;
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+<canvas id="particles"></canvas>
+<body>
+
+  <!-- Navigation -->
+  <header class="hero" id="home">
+    <nav class="navbar">
+      <div class="logo">CPTR 325</div>
+      <ul class="nav-links">
+        <li><a href="#home" class="nav-link active">Home</a></li>
+        <li><a href="#members" class="nav-link">Members</a></li>
+        <li><a href="#requirements" class="nav-link">Requirements</a></li>
+        <li><a href="#reflection" class="nav-link">Reflection</a></li>
+        <li><a href="#reference" class="nav-link">References</a></li>
+      </ul>
+
+      <button id="theme-toggle" aria-label="Toggle light/dark mode" title="Toggle theme">
+        <span id="theme-icon">☀️</span>
+        <span id="theme-label">Light Mode</span>
+      </button>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="hero-content">
+      <h1>Windows Server 2012 Lab Network</h1>
+      <p>A computer laboratory network system using Active Directory, DHCP, and Group Policy for managing 40 workstations.</p>
+      
+    </div>
+  </header>
+
+  <!-- Project Description -->
+  <section class="section" id="project">
+    <div class="container two-column">
+      <div class="reveal-left">
+        <h2>Project Overview</h2>
+        <p>Comprehensive Windows Server 2012 deployment featuring Active Directory Domain Services, DHCP, Group Policy Objects, roaming profiles, printer sharing, and remote administration for a production computer laboratory environment.</p>
+      </div>
+      <div class="reveal-right">
+        <img src="1.png" alt="Windows Server Manager Dashboard" class="responsive-image" />
+      </div>
+    </div>
+  </section>
+
+  <!-- Group Members - NEW PROFILE CARDS -->
+  <section class="section bg-light" id="members">
+    <div class="container">
+      <h2 class="reveal">Team Members</h2>
+      
+      <div class="members-grid reveal-group">
+        
+        <!-- Diana Trisha Agustin -->
+        <article class="member-card">
+          <div class="member-avatar">
+            <img src="PIC1.png" alt="Diana Trisha Agustin">
+          </div>
+          <h3 class="member-name">Diana Trisha Agustin</h3>
+          <div class="member-role">Server Specialist</div>
+          <p class="member-contrib">
+            Led server requirements implementation including Active Directory setup, 
+            DHCP configuration, and domain controller deployment across all 40 workstations.
+          </p>
+        </article>
+
+        <!-- Giecela Felix -->
+        <article class="member-card">
+          <div class="member-avatar">
+            <img src="PIC2.png" alt="Giecela Felix">
+          </div>
+          <h3 class="member-name">Giecela Felix</h3>
+          <div class="member-role">Web Developer</div>
+          <p class="member-contrib">
+            Designed and developed the project presentation website with modern UI/UX, 
+            responsive design, and interactive animations.
+          </p>
+        </article>
+
+        <!-- Rafael Campos -->
+        <article class="member-card">
+          <div class="member-avatar">
+            <img src="PIC3.png" alt="Rafael Campos">
+          </div>
+          <h3 class="member-name">Rafael Campos</h3>
+          <div class="member-role">Client Specialist</div>
+          <p class="member-contrib">
+            Implemented client-side requirements including workstation assignments, 
+            Group Policy deployment, and user restrictions.
+          </p>
+        </article>
+
+        <!-- Jesiel Bismano -->
+        <article class="member-card">
+          <div class="member-avatar">
+            <img src="PIC4.png" alt="Jesiel Bismanos">
+          </div>
+          <h3 class="member-name">Jesiel Bismanos</h3>
+          <div class="member-role">Documentation Lead</div>
+          <p class="member-contrib">
+            Authored comprehensive technical documentation, procedures, 
+            and reflection for all 16 project requirements.
+          </p>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Requirements Overview -->
+  <section class="section" id="requirements">
+    <div class="container">
+      <h2 class="reveal">Detailed Requirements (1–16)</h2>
+      <p class="reveal">Click each requirement to view full procedures and implementation details:</p>
+
+      <!-- First 4 cards: always visible, forced into one horizontal row -->
+      <div class="cards-first-row reveal-group">
+
+        <article class="card">
+          <h3>1. Domain Controller Setup</h3>
+          <p>Configure server as Domain Controller and join all 40 client computers to the domain.</p>
+          <a href="re1.html" class="card-link">Click here to see the procedure →</a>
+        </article>
+
+        <article class="card">
+          <h3>2. IP Addressing and DHCP</h3>
+          <p>Assign static IP to server and configure DHCP for automatic client IP distribution.</p>
+          <a href="re2.html" class="card-link">Click here to see the procedure →</a>
+        </article>
+
+        <article class="card">
+          <h3>3. User Accounts and OUs</h3>
+          <p>Create teacher and student accounts organized using Organizational Units (OUs).</p>
+          <a href="re3.html" class="card-link">Click here to see the procedure →</a>
+        </article>
+
+        <article class="card">
+          <h3>4. Automatic Shutdown</h3>
+          <p>Schedule automatic shutdown of all client computers at 11:30 AM daily.</p>
+          <a href="re4.html" class="card-link">Click here to see the procedure →</a>
+        </article>
+
+      </div>
+
+      <!-- Cards 5–16: hidden until Show More is clicked -->
+      <div class="cards-extra" id="extra-cards">
+
+        <article class="card">
+          <h3>5. Logon Time Restrictions</h3>
+          <p>Restrict user login based on assigned class schedules.</p>
+          <a href="re5.html" class="card-link">Click here to see the procedure →</a>
+        </article>
+
+        <article class="card">
+          <h3>6. Workstation Assignment</h3>
+          <p>Limit students to their assigned computer only.</p>
+          <a href="re6.html" class="card-link">Click here to see the procedure →</a>
+        </article>
+
+        <article class="card">
+          <h3>7. Home Folders & Quota</h3>
+          <p>Create secure home folders with 100MB storage limit.</p>
+          <a href="re7.html" class="card-link">Click here to see the procedure →</a>
+        </article>
+
+        <article class="card">
+          <h3>8. Delegated Admin Rights</h3>
+          <p>Allow teachers limited control over student accounts in their class.</p>
+          <a href="re8.html" class="card-link">Click here to see the procedure →</a>
+        </article>
+
+        <article class="card">
+          <h3>9. Remote Desktop Services (BONUS)</h3>
+          <p>Enable server-based application delivery using RDS.</p>
+          <a href="re9.html" class="card-link">Click here to see the procedure →</a>
+        </article>
+
+        <article class="card">
+          <h3>10. Remove Shutdown Options</h3>
+          <p>Disable shutdown and restart options for student accounts.</p>
+          <a href="re10.html" class="card-link">Click here to see the procedure →</a>
+        </article>
+
+        <article class="card">
+          <h3>11. Roaming Profiles (Students)</h3>
+          <p>Enable roaming profiles with restricted desktop settings.</p>
+          <a href="re11.html" class="card-link">Click here to see the procedure →</a>
+        </article>
+
+        <article class="card">
+          <h3>12. Network & USB Restrictions</h3>
+          <p>Restrict network access for selected classes and disable USB for students.</p>
+          <a href="re12.html" class="card-link">Click here to see the procedure →</a>
+        </article>
+
+        <article class="card">
+          <h3>13. Roaming Profiles (Teachers)</h3>
+          <p>Enable customizable roaming profiles for teachers.</p>
+          <a href="re13.html" class="card-link">Click here to see the procedure →</a>
+        </article>
+
+        <article class="card">
+          <h3>14. Remote Server Administration</h3>
+          <p>Allow remote management of the server using RDP and RSAT tools.</p>
+          <a href="re14.html" class="card-link">Click here to see the procedure →</a>
+        </article>
+
+        <article class="card">
+          <h3>15. Printer Sharing & Priority</h3>
+          <p>Configure shared printer with class-based priority and scheduling.</p>
+          <a href="re15.html" class="card-link">Click here to see the procedure →</a>
+        </article>
+
+        <article class="card">
+          <h3>16. Remote OS Deployment (BONUS)</h3>
+          <p>Deploy operating systems remotely using WDS or RIS.</p>
+          <a href="re16.html" class="card-link">Click here to see the procedure →</a>
+        </article>
+
+      </div>
+
+      <!-- Show More / Less Button -->
+      <div class="req-toggle-wrap">
+        <button id="req-toggle-btn" onclick="toggleRequirements()">
+          Show More ▼
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Reflection -->
+  <section class="section" id="reflection">
+    <div class="container">
+      <h2 class="reveal">Technical Reflection</h2>
+
+      <p class="reveal" style="text-align: justify;">
+        This project provided our group with hands-on experience in designing and managing
+        a complete Windows Server 2012 network infrastructure for a 40-computer laboratory.
+        We successfully configured Active Directory Domain Services (AD DS), DNS, DHCP,
+        Organizational Units, Group Policy Objects, roaming profiles, printer sharing,
+        remote administration, and other enterprise-level services.<br><br>
+      </p>
+
+      <p class="reveal" style="text-align: justify;">
+        One of the most important lessons we learned was the critical role of DNS in
+        Active Directory. We discovered that domain joining and user authentication
+        depend heavily on proper DNS configuration. Incorrect IP addressing or DNS
+        settings often caused clients to fail when locating the domain controller.
+        Through troubleshooting, we developed a better understanding of how network
+        services interact within a domain environment.<br><br>
+      </p>
+
+      <p class="reveal" style="text-align: justify;">
+        We also gained practical knowledge in using Group Policy to centrally manage
+        user and computer settings. By implementing password policies, desktop
+        restrictions, USB blocking, automatic shutdown, and wallpaper enforcement,
+        we saw how administrators can maintain security and consistency across all
+        client workstations from a single management console.<br><br>
+      </p>
+
+      <p class="reveal" style="text-align: justify;">
+        Configuring roaming profiles, home folders, and NTFS permissions taught us
+        the importance of access control and resource management. We learned how to
+        apply the principle of least privilege to ensure that students and teachers
+        only accessed the files and resources assigned to them.<br><br>
+      </p>
+
+      <p class="reveal" style="text-align: justify;">
+        This project also improved our troubleshooting skills. We encountered issues
+        such as domain join failures, DHCP scope misconfigurations, profile permission
+        errors, and Group Policy settings not applying correctly. Resolving these
+        problems required careful testing, log analysis, and repeated verification.<br><br>
+      </p>
+
+      <p class="reveal" style="text-align: justify;">
+        Overall, this project strengthened our technical skills in Windows Server
+        administration and gave us a deeper appreciation for the responsibilities of
+        a system administrator. We now have a clearer understanding of how enterprise
+        networks are planned, secured, deployed, and maintained in real-world
+        educational environments.<br><br>
+
+        We successfully completed all sixteen project requirements, including both
+        bonus requirements: Remote Desktop Services and Remote OS Deployment using
+        Windows Deployment Services (WDS). This achievement demonstrates our ability
+        to design, implement, and manage a fully functional enterprise network
+        environment using Windows Server 2012.
+      </p>
+    </div>
+  </section>
+
+  <!-- References -->
+<section class="section bg-light" id="reference">
+  <div class="container">
+    <h2 class="reveal">References & Sources</h2>
+
+    <ul class="references-list reveal-group">
+      <li>
+        <strong>YouTube Tutorial:</strong>
+        Windows Server Active Directory Setup
+        (<a href="https://youtu.be/ggOZOtoFxfo?si=HFLgKpt3XbQh4NIq" target="_blank">
+          watch here
+        </a>)
+      </li>
+
+      <li>
+        <strong>YouTube Tutorial:</strong>
+        DHCP Server Configuration Tutorial
+        (<a href="https://youtu.be/hkSnGdyJznA?si=pd3zyEBeZMImnDBv" target="_blank">
+          watch here
+        </a>)
+      </li>
+
+      <li>
+        <strong>Microsoft Learn:</strong>
+        Active Directory Domain Services Overview
+        (<a href="https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/get-started/virtual-dc/active-directory-domain-services-overview" target="_blank">
+          read here
+        </a>)
+      </li>
+
+      <li>
+        <strong>Microsoft Learn:</strong>
+        DHCP Server in Windows Server
+        (<a href="https://learn.microsoft.com/en-us/windows-server/networking/technologies/dhcp/dhcp-top" target="_blank">
+          read here
+        </a>)
+      </li>
+
+      <li>
+        <strong>Microsoft Learn:</strong>
+        Install and Configure DHCP Server
+        (<a href="https://learn.microsoft.com/en-us/troubleshoot/windows-server/networking/install-configure-dhcp-server-workgroup" target="_blank">
+          read here
+        </a>)
+      </li>
+
+      <li>
+        <strong>Microsoft Learn:</strong>
+        Group Policy Management
+        (<a href="https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/rds-vdi/group-policy-management" target="_blank">
+          read here
+        </a>)
+      </li>
+
+    </ul>
+  </div>
+</section>
+
+  <!-- Footer -->
+  <footer class="footer reveal">
+    <div class="container">
+      <p>© 2026 CPTR 325 Final Project | Mariano Marcos State University | <strong>All 16 Requirements ✅ Completed</strong></p>
+    </div>
+  </footer>
+
+  <!-- Particle Background Script -->
+  <script>
+    const canvas = document.getElementById("particles");
+    const ctx = canvas.getContext("2d");
+
+    let particles = [];
+    const particleCount = 80;
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    function createParticles() {
+      particles = [];
+      for (let i = 0; i < particleCount; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          size: Math.random() * 2 + 1,
+          speedX: (Math.random() - 0.5) * 0.4,
+          speedY: (Math.random() - 0.5) * 0.4
+        });
+      }
+    }
+
+    function drawParticles() {
+      const isLight = document.body.classList.contains("light-mode");
+      const dotColor = isLight ? "rgba(29, 78, 216, 0.75)" : "rgba(96, 165, 250, 0.8)";
+      const lineBase = isLight ? "29, 78, 216" : "96, 165, 250";
+      const lineMax  = isLight ? 0.25 : 0.12;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fillStyle = dotColor;
+        ctx.fill();
+      });
+      for (let a = 0; a < particles.length; a++) {
+        for (let b = a + 1; b < particles.length; b++) {
+          const dx = particles[a].x - particles[b].x;
+          const dy = particles[a].y - particles[b].y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          if (distance < 120) {
+            ctx.beginPath();
+            ctx.moveTo(particles[a].x, particles[a].y);
+            ctx.lineTo(particles[b].x, particles[b].y);
+            ctx.strokeStyle = `rgba(${lineBase}, ${lineMax - distance / 1000})`;
+            ctx.lineWidth = 1;
+            ctx.stroke();
+          }
+        }
+      }
+      particles.forEach(p => {
+        p.x += p.speedX;
+        p.y += p.speedY;
+        if (p.x < 0 || p.x > canvas.width) p.speedX *= -1;
+        if (p.y < 0 || p.y > canvas.height) p.speedY *= -1;
+      });
+      requestAnimationFrame(drawParticles);
+    }
+
+    window.addEventListener("resize", () => {
+      resizeCanvas();
+      createParticles();
+    });
+
+    resizeCanvas();
+    createParticles();
+    drawParticles();
+  </script>
+
+  <!-- ====== THEME TOGGLE ====== -->
+  <script>
+    const toggleBtn = document.getElementById("theme-toggle");
+    const themeIcon = document.getElementById("theme-icon");
+    const themeLabel = document.getElementById("theme-label");
+
+    const saved = localStorage.getItem("theme");
+    if (saved === "light ") {
+      document.body.classList.add("light-mode");
+      themeIcon.textContent = "🌙";
+      themeLabel.textContent = "Dark Mode";
+    }
+
+    toggleBtn.addEventListener("click", () => {
+      const isLight = document.body.classList.toggle("light-mode");
+      themeIcon.textContent = isLight ? "🌙" : "☀️";
+      themeLabel.textContent = isLight ? "Dark Mode" : "Light Mode";
+      localStorage.setItem("theme", isLight ? "light" : "dark");
+    });
+  </script>
+
+  <!-- ====== SHOW MORE / LESS ====== -->
+  <script>
+    let reqExpanded = false;
+
+    function toggleRequirements() {
+      reqExpanded = !reqExpanded;
+      const extra = document.getElementById("extra-cards");
+      const btn   = document.getElementById("req-toggle-btn");
+
+      if (reqExpanded) {
+        extra.classList.add("expanded");
+        btn.textContent = "Show Less  Requirements ▲";
+      } else {
+        extra.classList.remove("expanded");
+        btn.textContent = "Show More Requirements ▼";
+        // Scroll back up to requirements section when collapsing
+        document.getElementById("requirements").scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  </script>
+
+  <!-- ====== SCROLL REVEAL — IntersectionObserver ====== -->
+  <script>
+    const revealObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("active");
+            revealObserver.unobserve(entry.target);
+          }
+        });
+      },
+      {
+        threshold: 0.12,
+        rootMargin: "0px 0px -40px 0px"
+      }
+    );
+
+    document.querySelectorAll(
+      ".reveal, .reveal-left, .reveal-right, .reveal-group"
+    ).forEach(el => revealObserver.observe(el));
+  </script>
+
+  <!-- ====== ACTIVE NAV HIGHLIGHT ON SCROLL ====== -->
+  <script>
+    const sections = document.querySelectorAll('section[id], #home');
+    const navLinks = document.querySelectorAll('.nav-link');
+
+    function updateActiveNav() {
+      let current = '';
+      const scrollY = window.scrollY + 100; // Offset for better UX
+      
+      sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        const sectionHeight = section.clientHeight;
+        
+        if (scrollY >= sectionTop && scrollY < sectionTop + sectionHeight) {
+          current = section.getAttribute('id');
+        }
+      });
+
+      // Update active class
+      navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === `#${current}`) {
+          link.classList.add('active');
+        }
+      });
+    }
+
+    // Smooth scrolling for nav links
+    navLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const targetId = link.getAttribute('href');
+        const targetSection = document.querySelector(targetId);
+        
+        if (targetSection) {
+          targetSection.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      });
+    });
+
+    // Throttle scroll event for performance
+    let ticking = false;
+    function requestTick() {
+      if (!ticking) {
+        requestAnimationFrame(updateActiveNav);
+        ticking = true;
+      }
+    }
+
+    window.addEventListener('scroll', () => {
+      requestTick();
+      ticking = false;
+    });
+
+    // Initial check
+    updateActiveNav();
+
+    // Update on resize
+    window.addEventListener('resize', updateActiveNav);
+  </script>
+
+</body>
+</html>

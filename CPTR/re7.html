@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Requirement 7: Home Folders + 100MB FSRM Quota | CPTR 325</title>
+  <style>
+    /* 60A5FA DEFAULT THEME - COMPLETE */
+    :root {
+      --primary: #60a5fa; --primary-dark: #3b82f6; --primary-light: #93c5fd; --primary-glow: rgba(96, 165, 250, 0.5);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.97), rgba(51, 65, 85, 0.95)),
+        url('bg2.jpg'); background-size: cover; background-position: center; background-attachment: fixed;
+      color: #f8fafc; line-height: 1.7; min-height: 100vh;
+    }
+    .container { width: min(95%, 1200px); margin: 4rem auto; padding: 0 24px; }
+    h1 {
+      font-size: 50px; font-weight: 800; background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      margin-bottom: 3rem; text-align: center;
+    }
+    h4 { color: var(--primary-light); font-size: 1.5rem; font-weight: 700; margin: 2.5rem 0 1.5rem 0; padding-left: 1rem; border-left: 4px solid var(--primary); }
+    .doc-template {
+      background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(30px); padding: 4rem; border-radius: 32px;
+      border: 1px solid rgba(255, 255, 255, 0.15); border-left: 6px solid var(--primary);
+      box-shadow: 0 25px 80px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.1); margin: 4rem 0;
+    }
+    .doc-template ol li::before {
+      content: counter(step-counter); counter-increment: step-counter; position: absolute; left: 0; top: 1.75rem;
+      width: 2.5rem; height: 2.5rem; background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;
+    }
+    .quota-card { background: rgba(96, 165, 250, 0.15); border: 1px solid var(--primary-glow); border-radius: 20px; padding: 3rem; text-align: center; margin: 3rem 0; }
+    .quota-limit { font-size: 5rem; font-weight: 800; color: var(--primary); background: rgba(255,255,255,0.1); border-radius: 16px; padding: 1rem; display: inline-block; }
+    .code-block {
+      background: rgba(0,0,0,0.6); border: 1px solid var(--primary-glow); border-radius: 16px; padding: 2.5rem;
+      margin: 3rem 0; position: relative; font-family: 'Consolas', monospace;
+    }
+    .code-block::before {
+      content: '🏠 FSRM + NTFS + AD Mapping'; position: absolute; top: 1rem; right: 1.5rem;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; padding: 0.5rem 1.25rem;
+      border-radius: 20px; font-size: 0.85rem; font-weight: 600;
+    }
+    .btn { 
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; padding: 1.25rem 2.5rem;
+      border: none; border-radius: 20px; font-weight: 700; cursor: pointer; margin: 1rem; box-shadow: 0 15px 50px var(--primary-glow);
+      transition: all 0.3s; font-size: 1.1rem;
+    }
+    .btn:hover { transform: translateY(-3px); box-shadow: 0 25px 60px rgba(59,130,246,0.6); }
+    .btn-group { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; margin: 3rem 0; }
+    @media (max-width: 768px) { h1 { font-size: 2.5rem; } .btn-group { flex-direction: column; align-items: center; } }
+
+     /* ================= FLOATING VIDEO BUTTON - UPPER RIGHT ================= */
+    .video-btn {
+      position: fixed;
+      top: 2rem;
+      right: 2rem;
+      z-index: 100;
+      background: linear-gradient(135deg, #60a5fa, #3b82f6);
+      box-shadow: 0 15px 50px rgba(96, 165, 250, 0.4);
+      padding: 1rem 1.5rem;
+      font-size: 0.95rem;
+      max-width: none;
+      border-radius: 50px;
+      backdrop-filter: blur(20px);
+      animation: float 3s ease-in-out infinite;
+    }
+
+    .video-btn:hover {
+      transform: translateY(-8px) scale(1.08);
+      box-shadow: 0 25px 70px rgba(96, 165, 250, 0.6);
+      animation-play-state: paused;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+
+    /* ================= VIDEO MODAL ================= */
+    .video-modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.95);
+      backdrop-filter: blur(10px);
+    }
+
+    .video-modal-content {
+      position: relative;
+      margin: 5% auto;
+      width: 90%;
+      max-width: 1000px;
+      height: 70vh;
+      max-height: 600px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 40px 120px rgba(0, 0, 0, 0.8);
+      overflow: hidden;
+    }
+
+    .video-container {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+
+    .video-modal video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: 20px;
+    }
+
+    .close-modal {
+      position: absolute;
+      top: 20px;
+      right: 25px;
+      color: #f8fafc;
+      font-size: 2.5rem;
+      font-weight: 700;
+      cursor: pointer;
+      z-index: 1001;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+
+    .close-modal:hover {
+      background: rgba(239, 68, 68, 0.3);
+      transform: scale(1.1);
+      color: #ef4444;
+    }
+
+    /* ================= BUTTON GROUP - HORIZONTAL ================= */
+    .btn-group {
+      display: flex;
+      gap: 1.5rem;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: nowrap;
+      margin-top: 4rem;
+      padding: 0 2rem;
+    }
+
+    .btn-group .btn {
+      flex: 1;
+      max-width: 220px;
+      margin: 0;
+      white-space: nowrap;
+      justify-content: center;
+    }
+
+    .btn-group .btn:hover {
+      transform: translateY(-6px) scale(1.03);
+      flex: 1.05;
+    }
+
+    /* ================= RESPONSIVE ================= */
+    @media (max-width: 768px) {
+      .container {
+        margin: 2rem auto;
+        padding: 0 20px;
+      }
+
+      .doc-template {
+        padding: 2.5rem 2rem;
+        margin: 2rem 0;
+      }
+
+      .doc-image {
+        height: 280px;
+        margin: 2rem auto;
+      }
+
+      h1 {
+        font-size: 2.25rem;
+        margin-bottom: 2rem;
+      }
+
+      .video-modal-content {
+        width: 95%;
+        height: 60vh;
+        margin: 10% auto;
+      }
+
+      /* Mobile: Move video button to bottom right */
+      .video-btn {
+        top: auto;
+        bottom: 2rem;
+        right: 2rem;
+        left: 2rem;
+        max-width: calc(100% - 4rem);
+      }
+
+      .btn-group {
+        flex-direction: column;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+      
+      .btn-group .btn {
+        max-width: 100%;
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .doc-template ol li {
+        padding: 1.5rem 0 1.5rem 2.5rem;
+      }
+
+      .doc-template ol li::before {
+        width: 2.25rem;
+        height: 2.25rem;
+        font-size: 0.8rem;
+      }
+
+      .btn-group {
+        padding: 0 1rem;
+        gap: 1rem;
+      }
+
+      .close-modal {
+        font-size: 2rem;
+        top: 15px;
+        right: 20px;
+      }
+
+      .video-btn {
+        padding: 0.875rem 1.25rem;
+        font-size: 0.9rem;
+      }
+    }
+  
+ 
+  </style>
+</head>
+<body>
+     <!-- PROPER VIDEO BUTTON - UPPER RIGHT -->
+<button class="video-btn" onclick="openVideoModal()" type="button">
+  ▶️ Click to Watch Process Video
+</button>
+  <div class="container">
+    <h1>Requirement 7: Home Folders with Permissions and Quota</h1>
+
+    <!-- QUOTA DISPLAY -->
+    <div class="quota-card">
+      <h4>🎯 QUOTA</h4>
+      <div class="quota-limit">100 MB</div>
+      
+    </div>
+
+
+    <!-- PRODUCTION AUTOMATION SCRIPT -->
+    <div class="code-block">
+      <pre><code># HomeFolders-FULL-AUTOMATION.ps1
+# Run on FILE SERVER as Administrator
+
+Import-Module ServerManager
+$ServerName = $env:COMPUTERNAME
+$HomePath = "D:\HomeFolders"
+$Classes = @("CT1A","CT1B","CT2A","CT2B","CT3A","CT3B","CT4A","CT4B")
+
+Write-Host "🚀 STEP 1: Create Folder Structure" -ForegroundColor Cyan
+New-Item -Path $HomePath -ItemType Directory -Force
+foreach ($class in $Classes) { 
+    New-Item -Path "$HomePath\$class" -ItemType Directory -Force 
+    Write-Host "  📁 $HomePath\$class" -ForegroundColor Green
+}
+
+Write-Host "`n🚀 STEP 2: FSRM Role + Share" -ForegroundColor Cyan
+# Install FSRM if missing
+if (!(Get-WindowsFeature FS-Resource-Manager).Installed) {
+    Install-WindowsFeature -Name FS-Resource-Manager -IncludeManagementTools
+}
+
+# Create hidden share
+New-SmbShare -Name "HomeFolders$" -Path $HomePath -FullAccess "Administrators" -ChangeAccess "Authenticated Users" -Force
+
+Write-Host "`n🚀 STEP 3: Bulk Student Folders + NTFS" -ForegroundColor Cyan
+Import-Module ActiveDirectory
+foreach ($class in $Classes) {
+    $students = Get-ADUser -Filter * -SearchBase "OU=Users,OU=$class,DC=group1,DC=local"
+    $teacher = Get-ADUser -Filter "Title -like '*Teacher*'" -SearchBase "OU=Teachers,OU=$class,DC=group1,DC=local" | Select -First 1
+    
+    foreach ($student in $students) {
+        $folder = "$HomePath\$class\$($student.SamAccountName)-$class"
+        New-Item -Path $folder -ItemType Directory -Force
+        
+        # NTFS PERMISSIONS (Your exact spec)
+        icacls $folder /reset /T
+        icacls $folder /inheritance:d
+        icacls $folder /grant "${student.SamAccountName}:(OI)(CI)M"        # Student: Modify
+        icacls $folder /grant "${teacher.SamAccountName}:(OI)(CI)F"        # Teacher: Full  
+        icacls $folder /grant "Administrators:(OI)(CI)F"                   # Admins: Full
+        icacls $folder /grant "CREATOR OWNER:(OI)(CI)(IO)(MU)" /T          # Creator Owner
+        
+        Write-Host "  👤 $($student.SamAccountName) → $folder" -ForegroundColor Yellow
+    }
+}
+
+Write-Host "`n🚀 STEP 4: FSRM 100MB Quota (Per Student)" -ForegroundColor Cyan
+foreach ($class in $Classes) {
+    $students = Get-ADUser -Filter * -SearchBase "OU=Users,OU=$class,DC=group1,DC=local"
+    foreach ($student in $students) {
+        $quotaPath = "$HomePath\$class\$($student.SamAccountName)-$class"
+        if (Test-Path $quotaPath) {
+            dirquota quota add $quotaPath "100MB" "HardQuota" "C:\Windows\QuotaTemplate.xml"
+        }
+    }
+}
+
+Write-Host "`n🚀 STEP 5: AD Home Folder Mapping" -ForegroundColor Cyan
+foreach ($class in $Classes) {
+    $students = Get-ADUser -Filter * -SearchBase "OU=Users,OU=$class,DC=group1,DC=local"
+    foreach ($student in $students) {
+        Set-ADUser $student -HomeDirectory "\\$ServerName\HomeFolders$\$class\$($student.SamAccountName)-$class" -HomeDrive "H:"
+    }
+}
+
+Write-Host "`n✅ COMPLETE! Verify:" -ForegroundColor Green
+Write-Host "   dirquota quota list" -ForegroundColor White
+Write-Host "   echo %HOMEDRIVE% (student login)" -ForegroundColor White
+</code></pre>
+    </div>
+
+
+    <!-- ACTION BUTTONS -->
+    <div class="btn-group">
+      <a href="re6.html" class="btn">← Requirement 6</a>
+      <a href="index.html" class="btn">🏠 Overview</a>
+      <a href="re8.html" class="btn">Requirement 8 →</a>
+    </div>
+
+    <!-- VIDEO MODAL -->
+  <div id="videoModal" class="video-modal">
+    <div class="video-modal-content">
+      <span class="close-modal" onclick="closeVideoModal()">&times;</span>
+      <div class="video-container">
+        <video id="processVideo" controls preload="metadata">
+          <source src="7.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function openVideoModal() {
+      document.getElementById('videoModal').style.display = 'block';
+      document.getElementById('processVideo').play();
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeVideoModal() {
+      document.getElementById('videoModal').style.display = 'none';
+      document.getElementById('processVideo').pause();
+      document.getElementById('processVideo').currentTime = 0;
+      document.body.style.overflow = 'auto';
+    }
+
+    // Close modal when clicking outside video
+    window.onclick = function(event) {
+      const modal = document.getElementById('videoModal');
+      if (event.target === modal) {
+        closeVideoModal();
+      }
+    }
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        closeVideoModal();
+      }
+    });
+  </script>
+</body>
+</html>

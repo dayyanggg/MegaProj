@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Requirement 3 - User Accounts & OUs | CPTR 325</title>
+  <style>
+    /* ================= RESET & BASE ================= */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+      background: 
+        linear-gradient(135deg, 
+          rgba(15, 23, 42, 0.95), 
+          rgba(30, 41, 59, 0.97), 
+          rgba(51, 65, 85, 0.95)
+        ),
+        url('bg2.jpg');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      color: #f8fafc;
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+
+    /* ================= CONTAINER ================= */
+    .container {
+      width: min(95%, 1200px);
+      margin: 4rem auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* ================= TYPOGRAPHY ================= */
+    h1 {
+      font-size: 50px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #60a5fa, #3b82f6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 3rem;
+      text-align: center;
+      letter-spacing: -0.025em;
+    }
+
+    h4 {
+      color: #60a5fa;
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 2.5rem 0 1.5rem 0;
+      padding-left: 1rem;
+      border-left: 4px solid #60a5fa;
+    }
+
+    /* ================= DOC TEMPLATE ================= */
+    .doc-template {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(30px);
+      padding: 4rem;
+      border-radius: 32px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-left: 6px solid linear-gradient(135deg, #8b5cf6, #1f5196);
+      box-shadow: 
+        0 25px 80px rgba(0,0,0,0.25),
+        inset 0 1px 0 rgba(255,255,255,0.1);
+      margin: 4rem 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .doc-template::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(135deg, #60a5fa, #3b82f6);
+    }
+
+    /* ================= ORDERED LIST ================= */
+    .doc-template ol {
+      counter-reset: step-counter;
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .doc-template ol li {
+      counter-increment: step-counter;
+      padding: 1.75rem 0 1.75rem 3rem;
+      position: relative;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.3s ease;
+    }
+
+    .doc-template ol li:hover {
+      background: rgba(139, 92, 246, 0.12);
+      padding-left: 3.5rem;
+      border-radius: 12px;
+      margin: 0 -1rem;
+      padding-right: 1rem;
+    }
+
+    .doc-template ol li:last-child {
+      border-bottom: none;
+    }
+
+    .doc-template ol li::before {
+      content: counter(step-counter);
+      position: absolute;
+      left: 0;
+      top: 1.75rem;
+      width: 2.5rem;
+      height: 2.5rem;
+      background: linear-gradient(135deg, #60a5fa, #3b82f6);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.875rem;
+      box-shadow: 0 4px 16px rgba(96, 165, 250, 0.5);
+      transition: all 0.3s ease;
+    }
+
+    .doc-template ol li:hover::before {
+      transform: scale(1.1);
+      box-shadow: 0 6px 20px rgba(96, 165, 250, 0.7);
+    }
+
+    /* ================= CODE BLOCKS ================= */
+    .code-block {
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(96, 165, 250, 0.3);
+      border-radius: 16px;
+      padding: 2.5rem;
+      margin: 3rem 0;
+      position: relative;
+      overflow: hidden;
+      font-family: 'Consolas', 'Monaco', monospace;
+    }
+
+    .code-block::before {
+      content: '💜 PowerShell Script';
+      position: absolute;
+      top: 1rem;
+      right: 1.5rem;
+      background: linear-gradient(135deg, #60a5fa, #3b82f6);
+      color: white;
+      padding: 0.5rem 1.25rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .code-block pre {
+      font-size: 0.95rem;
+      line-height: 1.65;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .code-block .keyword { color: #1862d8; font-weight: 600; }
+    .code-block .string { color: #10b981; }
+    .code-block .comment { color: #6b7280; }
+
+    /* ================= OU STRUCTURE ================= */
+    .ou-structure {
+      background: rgba(139, 92, 246, 0.15);
+      border: 1px solid rgba(139, 92, 246, 0.3);
+      border-radius: 20px;
+      padding: 2.5rem;
+      margin: 3rem 0;
+      backdrop-filter: blur(20px);
+    }
+
+    .ou-structure h5 {
+      color: #60a5fa;
+      font-size: 1.375rem;
+      margin-bottom: 1.5rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .ou-tree {
+      font-family: 'Courier New', monospace;
+      background: rgba(0,0,0,0.4);
+      padding: 2rem;
+      border-radius: 12px;
+      border-left: 4px solid #60a5fa;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      white-space: pre-line;
+      overflow-x: auto;
+    }
+
+    /* ================= USER SUMMARY ================= */
+    .user-summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.75rem;
+      margin: 2.5rem 0;
+    }
+
+    .user-card {
+      background: rgba(255, 255, 255, 0.08);
+      padding: 2rem;
+      border-radius: 20px;
+      border-left: 5px solid #60a5fa;
+      text-align: center;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .user-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(135deg, #60a5fa, #3b82f6);
+    }
+
+    .user-card:hover {
+      transform: translateY(-12px);
+      box-shadow: 0 25px 80px rgba(96, 165, 250, 0.3);
+      border-left-color: #60a5fa;
+    }
+
+    .user-number {
+      font-size: 3rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #60a5fa, #3b82f6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 1rem;
+      line-height: 1;
+    }
+
+    .user-label {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: #f8fafc;
+      margin-bottom: 0.75rem;
+    }
+
+    .user-detail {
+      color: #60a5fa;
+      font-size: 0.95rem;
+      opacity: 0.9;
+    }
+
+    /* ================= IMAGES ================= */
+    .doc-image {
+      width: 100%;
+      max-width: 900px;
+      height: 420px;
+      object-fit: cover;
+      border-radius: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      margin: 3rem auto;
+      display: block;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .doc-image:hover {
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 40px 120px rgba(96, 165, 250, 0.25);
+      border-color: rgba(96, 165, 250, 0.4);
+    }
+
+    /* ================= BUTTONS ================= */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: linear-gradient(135deg, #60a5fa, #3b82f6);
+      color: #ffffff;
+      padding: 1.25rem 2.5rem;
+      border-radius: 20px;
+      font-weight: 700;
+      text-decoration: none;
+      box-shadow: 0 15px 50px rgba(96, 165, 250, 0.4);
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      font-size: 1.1rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      position: relative;
+      overflow: hidden;
+      margin: 1.5rem;
+      text-align: center;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      transition: left 0.7s;
+    }
+
+    .btn:hover::before {
+      left: 100%;
+    }
+
+    .btn:hover {
+      transform: translateY(-6px) scale(1.05);
+      box-shadow: 0 30px 80px rgba(96, 165, 250, 0.6);
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 1.5rem;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: nowrap;
+      margin-top: 4rem;
+      padding: 0 2rem;
+    }
+
+    .btn-group .btn {
+      flex: 1;
+      max-width: 220px;
+      margin: 0;
+      white-space: nowrap;
+      justify-content: center;
+    }
+
+    .btn-group .btn:hover {
+      transform: translateY(-6px) scale(1.03);
+      flex: 1.05;
+    }
+
+    /* ================= RESPONSIVE ================= */
+    @media (max-width: 768px) {
+      .container { margin: 2rem auto; padding: 0 20px; }
+      .doc-template { padding: 2.5rem 2rem; margin: 2rem 0; }
+      .doc-image { height: 300px; margin: 2rem auto; }
+      h1 { font-size: 2.25rem; margin-bottom: 2rem; }
+      .user-summary { grid-template-columns: 1fr; }
+      .btn-group { 
+        flex-direction: column; 
+        gap: 1rem; 
+        flex-wrap: wrap; 
+      }
+      .btn-group .btn { max-width: 100%; width: 100%; }
+      .ou-tree { font-size: 0.9rem; padding: 1.5rem; }
+    }
+
+    @media (max-width: 480px) {
+      .doc-template ol li { padding: 1.5rem 0 1.5rem 2.5rem; }
+      .doc-template ol li::before { width: 2.25rem; height: 2.25rem; font-size: 0.8rem; }
+      .btn-group { padding: 0 1rem; gap: 1rem; }
+      .user-number { font-size: 2.25rem; }
+    }
+    /* ================= FLOATING VIDEO BUTTON - UPPER RIGHT ================= */
+    .video-btn {
+      position: fixed;
+      top: 2rem;
+      right: 2rem;
+      z-index: 100;
+      background: linear-gradient(135deg, #60a5fa, #3b82f6);
+      box-shadow: 0 15px 50px rgba(96, 165, 250, 0.4);
+      padding: 1rem 1.5rem;
+      font-size: 0.95rem;
+      max-width: none;
+      border-radius: 50px;
+      backdrop-filter: blur(20px);
+      animation: float 3s ease-in-out infinite;
+    }
+
+    .video-btn:hover {
+      transform: translateY(-8px) scale(1.08);
+      box-shadow: 0 25px 70px rgba(96, 165, 250, 0.6);
+      animation-play-state: paused;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+
+    /* ================= VIDEO MODAL ================= */
+    .video-modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.95);
+      backdrop-filter: blur(10px);
+    }
+
+    .video-modal-content {
+      position: relative;
+      margin: 5% auto;
+      width: 90%;
+      max-width: 1000px;
+      height: 70vh;
+      max-height: 600px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 40px 120px rgba(0, 0, 0, 0.8);
+      overflow: hidden;
+    }
+
+    .video-container {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+
+    .video-modal video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: 20px;
+    }
+
+    .close-modal {
+      position: absolute;
+      top: 20px;
+      right: 25px;
+      color: #f8fafc;
+      font-size: 2.5rem;
+      font-weight: 700;
+      cursor: pointer;
+      z-index: 1001;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+
+    .close-modal:hover {
+      background: rgba(239, 68, 68, 0.3);
+      transform: scale(1.1);
+      color: #ef4444;
+    }
+
+    /* ================= BUTTON GROUP - HORIZONTAL ================= */
+    .btn-group {
+      display: flex;
+      gap: 1.5rem;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: nowrap;
+      margin-top: 4rem;
+      padding: 0 2rem;
+    }
+
+    .btn-group .btn {
+      flex: 1;
+      max-width: 220px;
+      margin: 0;
+      white-space: nowrap;
+      justify-content: center;
+    }
+
+    .btn-group .btn:hover {
+      transform: translateY(-6px) scale(1.03);
+      flex: 1.05;
+    }
+
+    /* ================= RESPONSIVE ================= */
+    @media (max-width: 768px) {
+      .container {
+        margin: 2rem auto;
+        padding: 0 20px;
+      }
+
+      .doc-template {
+        padding: 2.5rem 2rem;
+        margin: 2rem 0;
+      }
+
+      .doc-image {
+        height: 280px;
+        margin: 2rem auto;
+      }
+
+      h1 {
+        font-size: 2.25rem;
+        margin-bottom: 2rem;
+      }
+
+      .video-modal-content {
+        width: 95%;
+        height: 60vh;
+        margin: 10% auto;
+      }
+
+      /* Mobile: Move video button to bottom right */
+      .video-btn {
+        top: auto;
+        bottom: 2rem;
+        right: 2rem;
+        left: 2rem;
+        max-width: calc(100% - 4rem);
+      }
+
+      .btn-group {
+        flex-direction: column;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+      
+      .btn-group .btn {
+        max-width: 100%;
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .doc-template ol li {
+        padding: 1.5rem 0 1.5rem 2.5rem;
+      }
+
+      .doc-template ol li::before {
+        width: 2.25rem;
+        height: 2.25rem;
+        font-size: 0.8rem;
+      }
+
+      .btn-group {
+        padding: 0 1rem;
+        gap: 1rem;
+      }
+
+      .close-modal {
+        font-size: 2rem;
+        top: 15px;
+        right: 20px;
+      }
+
+      .video-btn {
+        padding: 0.875rem 1.25rem;
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+    <!-- PROPER VIDEO BUTTON - UPPER RIGHT -->
+<button class="video-btn" onclick="openVideoModal()" type="button">
+  ▶️ Click to Watch Process Video
+</button>
+  <div class="container">
+    <h1>Requirement 3: User Accounts & Organizational Units</h1>
+    
+    <div class="doc-template">
+      <h4>Step-by-Step Procedure:</h4>
+      <ol>
+        <li><strong>Create 8 OUs:</strong> CT1A, CT1B, CT2A, CT2B, CT3A, CT3B, CT4A, CT4B</li>
+        <li><strong>Automated OU Creation:</strong> PowerShell script executed successfully</li>
+        <li><strong>Create Teacher Accounts:</strong> 1 teacher per class (8 total)</li>
+        <li><strong>Create Student Accounts:</strong> 40 students per class (320 total)</li>
+        <li><strong>Verify Structure:</strong> ADUC → Check OU population & inheritance</li>
+      </ol>
+      
+      <!-- PowerShell Scripts -->
+      <div class="code-block">
+        <pre><span class="comment"># CREATE ORGANIZATIONAL UNITS</span>
+<span class="keyword">$ous</span> = @("CT1A","CT1B","CT2A","CT2B","CT3A","CT3B","CT4A","CT4B")
+foreach (<span class="keyword">$ou</span> in <span class="keyword">$ous</span>) {
+    New-ADOrganizationalUnit -Name <span class="keyword">$ou</span> -Path "DC=group1,DC=local"
+}
+
+<span class="comment"># CREATE USERS (8 Teachers + 320 Students)</span>
+<span class="keyword">$classes</span> = @("CT1A","CT1B","CT2A","CT2B","CT3A","CT3B","CT4A","CT4B")
+foreach (<span class="keyword">$class</span> in <span class="keyword">$classes</span>) {
+    <span class="comment"># Teacher Account</span>
+    New-ADUser -Name "teacher_$<span class="keyword">$class</span>" `
+    -SamAccountName "teacher_$<span class="keyword">$class</span>" `
+    -UserPrincipalName "teacher_$<span class="keyword">$class</span>@group1.local" `
+    -Path "OU=$<span class="keyword">$class</span>,DC=group1,DC=local" `
+    -AccountPassword (<span class="function">ConvertTo-SecureString</span> "P@ssw0rd123" -AsPlainText -Force) `
+    -Enabled <span class="keyword">$true</span>
+
+    <span class="comment"># 40 Student Accounts per Class</span>
+    for (<span class="keyword">$i</span>=1; <span class="keyword">$i</span> -le 40; <span class="keyword">$i</span>++) {
+        <span class="keyword">$num</span> = "{0:D2}" -f <span class="keyword">$i</span>
+        New-ADUser -Name "stud${<span class="keyword">$num</span>}_$<span class="keyword">$class</span>" `
+        -SamAccountName "stud${<span class="keyword">$num</span>}_$<span class="keyword">$class</span>" `
+        -UserPrincipalName "stud${<span class="keyword">$num</span>}_$<span class="keyword">$class</span>@group1.local" `
+        -Path "OU=$<span class="keyword">$class</span>,DC=group1,DC=local" `
+        -AccountPassword (<span class="function">ConvertTo-SecureString</span> "P@ssw0rd123" -AsPlainText -Force) `
+        -Enabled <span class="keyword">$true</span>
+    }
+}</pre>
+      </div>
+      
+      </div>
+      
+      <!-- User Summary -->
+      <div class="user-summary">
+        <div class="user-card">
+          <div class="user-number">8</div>
+          <div class="user-label">Classes</div>
+          <div class="user-detail">CT1A-CT4B</div>
+        </div>
+        <div class="user-card">
+          <div class="user-number">8</div>
+          <div class="user-label">Teachers</div>
+          <div class="user-detail">1 per class</div>
+        </div>
+        <div class="user-card">
+          <div class="user-number">320</div>
+          <div class="user-label">Students</div>
+          <div class="user-detail">40 per class</div>
+        </div>
+        <div class="user-card">
+          <div class="user-number">328</div>
+          <div class="user-label">Total Users</div>
+          <div class="user-detail">Automated creation</div>
+        </div>
+      </div>
+      
+      <img src="5.png" alt="Creating OUs in ADUC" class="doc-image">
+    </div>
+    
+    <!-- Navigation Buttons -->
+    <div class="btn-group">
+      <a href="re2.html" class="btn">← Requirement 2</a>
+      <a href="index.html" class="btn">🏠 Overview</a>
+      <a href="re4.html" class="btn">Requirement 4 →</a>
+    </div>
+  </div>
+  <!-- VIDEO MODAL -->
+  <div id="videoModal" class="video-modal">
+    <div class="video-modal-content">
+      <span class="close-modal" onclick="closeVideoModal()">&times;</span>
+      <div class="video-container">
+        <video id="processVideo" controls preload="metadata">
+          <source src="3.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function openVideoModal() {
+      document.getElementById('videoModal').style.display = 'block';
+      document.getElementById('processVideo').play();
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeVideoModal() {
+      document.getElementById('videoModal').style.display = 'none';
+      document.getElementById('processVideo').pause();
+      document.getElementById('processVideo').currentTime = 0;
+      document.body.style.overflow = 'auto';
+    }
+
+    // Close modal when clicking outside video
+    window.onclick = function(event) {
+      const modal = document.getElementById('videoModal');
+      if (event.target === modal) {
+        closeVideoModal();
+      }
+    }
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        closeVideoModal();
+      }
+    });
+  </script>
+</body>
+</html>
